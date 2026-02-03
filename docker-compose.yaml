@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports: ["8090:8080"]
+    depends_on: [db]
+    environment:
+      - DB_URL=postgres://user:password@db:5432/subscriptions?sslmode=disable
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: subscriptions
