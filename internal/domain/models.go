@@ -1,4 +1,4 @@
-package models
+package domain
 
 import (
 	"encoding/json"
@@ -20,6 +20,10 @@ func (c *CustomDate) UnmarshalJSON(b []byte) error {
 
 func (c CustomDate) MarshalJSON() ([]byte, error) {
 	return json.Marshal(time.Time(c).Format("01-2006"))
+}
+
+func (c CustomDate) Time() time.Time {
+	return time.Time(c)
 }
 
 type Subscription struct {
