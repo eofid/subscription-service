@@ -1,0 +1,126 @@
+openapi: 3.0.0
+info:
+  title: Subscription Service API
+  description: API для управления подписками и подсчета расходов.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8090
+    description: Local server
+
+paths:
+  /subscriptions:
+    post:
+      summary: Создать новую подписку
+      tags: [Subscriptions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionInput'
+      responses:
+        '201':
+          description: Подписка успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Ошибка валидации
+        '500':
+          description: Серверная ошибка
+
+  /subscriptions/{id}:
+    put:
+      summary: Обновить подписку
+      tags: [Subscriptions]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionInput'
+      responses:
+        '200':
+          description: Успешно обновлено
+        '404':
+          description: Подписка не найдена
+
+    delete:
+      summary: Удалить подписку
+      tags: [Subscriptions]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешно удалено
+        '404':
+          description: Подписка не найдена
+
+  /subscriptions/total:
+    get:
+      summary: Получить общую стоимость подписок пользователя
+      tags: [Aggregations]
+      parameters:
+        - in: query
+          name: user_id
+          required: true
+          schema:
+            type: string
+          description: UUID пользователя
+      responses:
+        '200':
+          description: Успешный расчет
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  total:
+                    type: integer
+                  currency:
+                    type: string
+                    example: RUB
+
+components:
+  schemas:
+    SubscriptionInput:
+      type: object
+      required: [service_name, price, user_id, start_date]
+      properties:
+        service_name:
+          type: string
+          example: "Yandex Plus"
+        price:
+          type: integer
+          example: 400
+        user_id:
+          type: string
+          example: "uuid-string"
+        start_date:
+          type: string
+          example: "01-2025"
+        end_date:
+          type: string
+          nullable: true
+          example: "12-2025"
+    
+    Subscription:
+      allOf:
+        - $ref: '#/components/schemas/SubscriptionInput'
+        - type: object
+          properties:
+            id:
+              type: integer
